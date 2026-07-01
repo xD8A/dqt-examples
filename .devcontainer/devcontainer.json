@@ -19,6 +19,9 @@
         "QT_QPA_PLATFORM_PLUGIN_PATH": "/opt/qt-6.4.2/plugins",
         "LIBGL_ALWAYS_SOFTWARE": "1"
     },
+    "remoteEnv": {
+        "PATH": "${containerEnv:PATH}:/opt/qt-6.4.2/libexec"
+    },
     "remoteUser": "vscode",
     "postStartCommand": "chown -R vscode:vscode /vscode",
     "customizations": {

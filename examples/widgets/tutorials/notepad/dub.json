@@ -1,0 +1,16 @@
+{
+    "name": "notepad",
+    "description": "Notepad tutorial - DQt port",
+    "authors": ["dqt-examples"],
+    "preBuildCommands": ["rcc -binary notepad.qrc -o notepad.rcc"],
+    "dependencies": {
+        "dqt": {
+            "path": "../../../../libs/dqt"
+        }
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "stringImportPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}

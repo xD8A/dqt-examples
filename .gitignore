@@ -17,3 +17,6 @@ bin/
 *.gz
 *.xz
 *.bz2
+
+# Compiled Qt resource files (generated from .qrc by rcc)
+*.rcc

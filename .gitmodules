@@ -1,0 +1,4 @@
+[submodule "libs/dqt"]
+	path = libs/dqt
+	url = https://github.com/xD8A/dqt.git
+	branch = master
