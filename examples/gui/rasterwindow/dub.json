@@ -1,0 +1,22 @@
+{
+    "name": "rasterwindow",
+    "description": "Raster window example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:gui": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetPath": "bin",
+    "configurations": [
+        {
+            "name": "app",
+            "targetType": "executable",
+            "mainSourceFile": "main.d"
+        },
+        {
+            "name": "library",
+            "targetType": "sourceLibrary"
+        }
+    ]
+}

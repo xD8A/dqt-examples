@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "dub build analogclock",
+            "type": "shell",
+            "command": "dub build --compiler=ldc2",
+            "options": {
+                "cwd": "${workspaceFolder}/examples/gui/analogclock"
+            },
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

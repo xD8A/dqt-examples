@@ -36,6 +36,17 @@ After that, GUI examples should work out of the box on Linux hosts.
 
 ## Examples
 
+All examples are ports of the [Qt 6.4.2 base examples](https://github.com/qt/qtbase/tree/6.4.2/examples) and reside under `examples/`.
+
+### GUI (`gui/`)
+
+Examples demonstrating QWindow and QPainter-based rendering:
+
+- **rasterwindow** — minimal QWindow rendering with QPainter via QBackingStore
+- **analogclock** — analog clock with hour/minute hands using QPainter transforms, depends on RasterWindow
+
+### Widgets Tutorials (`widgets/tutorials/`)
+
 All examples are ports of the [Qt 6.4.2 Widgets tutorials](https://github.com/qt/qtbase/tree/6.4.2/examples/widgets/tutorials) and reside under `examples/widgets/tutorials/`.
 
 ### Getting Started (`gettingStarted/gsQt/`)

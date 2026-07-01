@@ -1,0 +1,17 @@
+{
+    "name": "analogclock",
+    "description": "Analog clock example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "rasterwindow": {
+            "path": "../rasterwindow",
+            "dependencyConfig": "library"
+        },
+        "dqt:gui": "*",
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}

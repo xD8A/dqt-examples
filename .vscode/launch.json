@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug analogclock",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/gui/analogclock/bin/analogclock",
+            "args": [],
+            "cwd": "${workspaceFolder}/examples/gui/analogclock",
+            "preLaunchTask": "dub build analogclock"
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "name": "gui",
+    "subPackages": [
+        "rasterwindow/",
+        "analogclock/"
+    ]
+}
