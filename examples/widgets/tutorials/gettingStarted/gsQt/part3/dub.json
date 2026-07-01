@@ -1,0 +1,12 @@
+{
+    "name": "gsqt_part3",
+    "description": "Getting Started with Qt - Part 3 (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}
