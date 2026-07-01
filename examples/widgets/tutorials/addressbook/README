@@ -1,0 +1,25 @@
+The Address Book Tutorial shows how to put together a simple yet
+fully-functioning GUI application. The tutorial chapters can be found in the
+Qt documentation, which can be viewed using Qt Assistant or a Web browser.
+
+The tutorial is also available online at
+
+http://qt-project.org/doc/qt-5.0/qtwidgets/tutorials-addressbook.html
+
+This is a D/Qt port of the original C++ tutorial, using DQt bindings.
+
+Building with DUB (all parts):
+
+    dub build --compiler=ldc2 :part1
+    dub build --compiler=ldc2 :part2
+    dub build --compiler=ldc2 :part3
+    dub build --compiler=ldc2 :part4
+    dub build --compiler=ldc2 :part5
+    dub build --compiler=ldc2 :part6
+    dub build --compiler=ldc2 :part7
+
+Or build a single part from its directory:
+
+    cd part1 && dub build --compiler=ldc2
+
+Binaries are placed in partN/bin/.

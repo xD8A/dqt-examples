@@ -1,0 +1,15 @@
+{
+    "name": "addressbook",
+    "description": "Address Book Tutorial - DQt port",
+    "authors": ["dqt-examples"],
+    "targetType": "none",
+    "subPackages": [
+        { "name": "part1", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["part1"], "importPaths": ["part1"], "targetType": "executable", "targetPath": "part1/bin" },
+        { "name": "part2", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["part2"], "importPaths": ["part2"], "targetType": "executable", "targetPath": "part2/bin" },
+        { "name": "part3", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["part3"], "importPaths": ["part3"], "targetType": "executable", "targetPath": "part3/bin" },
+        { "name": "part4", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["part4"], "importPaths": ["part4"], "targetType": "executable", "targetPath": "part4/bin" },
+        { "name": "part5", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["part5"], "importPaths": ["part5"], "targetType": "executable", "targetPath": "part5/bin" },
+        { "name": "part6", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["part6"], "importPaths": ["part6"], "targetType": "executable", "targetPath": "part6/bin" },
+        { "name": "part7", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["part7"], "importPaths": ["part7"], "targetType": "executable", "targetPath": "part7/bin" }
+    ]
+}
