@@ -34,6 +34,53 @@ xhost +local:
 
 After that, GUI examples should work out of the box on Linux hosts.
 
+## Examples
+
+All examples are ports of the [Qt 6.4.2 Widgets tutorials](https://github.com/qt/qtbase/tree/6.4.2/examples/widgets/tutorials) and reside under `examples/widgets/tutorials/`.
+
+### Getting Started (`gettingStarted/gsQt/`)
+
+A 5-part series that progressively builds a Qt Widgets application:
+- **part1** — basic window with a widget
+- **part2** — layouts and child widgets
+- **part3** — signals and slots
+- **part4** — custom dialogs
+- **part5** — complete application with menus and toolbars
+
+### Widgets Tutorial (`widgets/`)
+
+A 4-part series on basic widget usage:
+- **toplevel** — creating top-level windows
+- **childwidget** — embedding child widgets
+- **windowlayout** — arranging widgets in a window
+- **nestedlayouts** — nesting layouts for complex UIs
+
+### Address Book (`addressbook/`)
+
+A 7-part series that builds a complete address book application:
+- **part1** — basic UI setup
+- **part2** — adding contacts
+- **part3** — browsing contacts
+- **part4** — editing and removing contacts
+- **part5** — finding and sorting
+- **part6** — importing and exporting
+- **part7** — custom dialogs and final polish
+
+### Model/View (`modelview/`)
+
+A 7-part series on Qt's Model/View programming pattern:
+- **1_readonly** — read-only table model
+- **2_formatting** — custom formatting
+- **3_changingmodel** — dynamically changing models
+- **4_headers** — row and column headers
+- **5_edit** — editing items
+- **6_treeview** — tree views
+- **7_selections** — selection handling
+
+### Notepad (`notepad/`)
+
+A standalone text editor with file I/O, menus, toolbars, font selection, and formatting toggles.
+
 ## License
 
 BSD-3-Clause (same as the original Qt examples).

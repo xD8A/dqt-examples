@@ -1,0 +1,326 @@
+// Copyright (C) 2022 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
+
+/*!
+    \example tutorials/notepad
+    \title Getting Started Programming with Qt Widgets
+    \brief A tutorial for Qt Widgets based notepad application.
+
+    In this topic, we teach basic Qt knowledge by implementing a simple
+    Notepad application using D and the \l{Qt Widgets} module via the
+    DQt binding library. The application is a small text editor which
+    allows you to create a text file, save it, or reopen and edit it
+    again. You can also set the font to be used and toggle bold, italic,
+    and underline formatting.
+
+    \image notepad1.png "Notepad application"
+
+    \include examples-run.qdocinc
+
+    \section1 Project Overview
+
+    The notepad example uses the D programming language with DQt, a
+    set of D bindings for Qt 6. The project is built with the Dub
+    package manager and consists of the following files:
+
+    \list
+        \li dub.json - the project file for Dub.
+        \li main.d - the main source file for the application.
+        \li notepad.d - the source file containing the Notepad class.
+        \li notepad.ui - the UI form for the Notepad widget.
+        \li notepad.qrc - Qt resource file listing embedded images.
+    \endlist
+
+    The application uses a QMainWindow with a menu bar, toolbar, and
+    status bar. The central widget is a QTextEdit that provides rich
+    text editing capabilities.
+
+    \section1 Main Source File
+
+    The main.d file contains the application entry point:
+
+    \quotefromfile tutorials/notepad/main.d
+    \skipto module main;
+    \printuntil }
+
+    The following lines import the Notepad module and Qt Application
+    class:
+
+    \quotefromfile tutorials/notepad/main.d
+    \skipto import notepad;
+    \printuntil Application
+
+    The following line defines the main function that is the entry point
+    for all D programs:
+
+    \printline int main
+
+    The following line creates a QApplication object. This object manages
+    application-wide resources and is necessary to run any Qt program
+    that uses Qt Widgets:
+
+    \skipuntil {
+    \printline scope app
+
+    The following line creates the Notepad widget using \c cpp_new to
+    allocate it on the heap. The \c scope(exit) destructor ensures the
+    widget is properly deleted when it goes out of scope:
+
+    \printline cpp_new!Notepad
+    \printline cpp_delete(notepad)
+
+    The widget is shown on the screen with \c show(). Widgets are not
+    visible by default:
+
+    \printline notepad.show
+
+    The following line makes the QApplication enter its event loop. When
+    a Qt application is running, events are generated and sent to the
+    widgets of the application. Examples of events are mouse presses
+    and key strokes:
+
+    \printline app.exec
+
+    \b{Learn More}
+
+    \table
+        \header
+            \li About
+            \li Here
+        \row
+            \li Widgets and Window Geometry
+            \li \l{Window and Dialog Widgets}
+        \row
+            \li Events and event handling
+            \li \l{The Event System}
+    \endtable
+
+    \section1 Designing a UI
+
+    The user interface is defined in XML format in the notepad.ui
+    file. When you build the application, the \l{User Interface
+    Compiler (uic)} reads the .ui file and generates a corresponding
+    C++ header file (ui_notepad.h). This generated header is used by
+    the D binding at compile time.
+
+    \section2 The UI Form
+
+    The form is based on QMainWindow and contains a menu bar, a
+    toolbar, a central widget area with a QTextEdit, and a status
+    bar. The menus are:
+
+    \list
+        \li \b File - New, Open, Save, Save As, Print, Exit
+        \li \b Edit - Copy, Cut, Paste, Undo, Redo, Font
+        \li \b About - About Notepad
+    \endlist
+
+    The toolbar provides quick access to all actions with icons.
+
+    The UI file starts with the XML declaration:
+
+    \code
+    <?xml version="1.0" encoding="UTF-8"?>
+    \endcode
+
+    The \c ui element defines the Notepad widget:
+
+    \code
+    <ui version="4.0">
+    \endcode
+
+    \section2 Notepad Source File
+
+    The Notepad class is defined in notepad.d. It inherits from
+    QMainWindow and declares itself as a QObject using the
+    \c{Q_OBJECT_D} mixin:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto class Notepad
+    \printuntil Q_OBJECT_D;
+
+    The constructor creates the UI and connects signals to slots
+    using DQt's signal/slot syntax:
+
+    \skipto this(QWidget parent = null)
+    \printuntil }
+
+    The \c{ui} member is allocated with \c{cpp_new} and initialized
+    via \c{setupUi}:
+
+    \printuntil ui = cpp_new!
+    \printuntil ui.setupUi
+
+    Signal-slot connections use the \c connect function with
+    \c signal!"name" and \c slot!"name" templates:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto connect(ui.actionNew.signal!"triggered", this.slot!"newDocument");
+    \printuntil connect(ui.actionAbout.signal!"triggered", this.slot!"about");
+
+    The print action and clipboard actions are initially disabled:
+
+    \skipto ui.actionPrint.setEnabled(false);
+    \printuntil ui.actionRedo.setEnabled(false);
+
+    In the destructor, the UI object is deleted:
+
+    \skipto ~this()
+    \printuntil }
+
+    \section1 Adding User Interaction
+
+    \section2 Creating a New Document
+
+    The \c newDocument slot clears the current file and text buffer:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto @QSlot final void newDocument
+    \printuntil }
+
+    \section2 Opening a File
+
+    The \c open slot displays a file dialog and loads the selected file:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto @QSlot final void open
+    \printuntil }
+
+    \c QFileDialog::getOpenFileName opens a dialog enabling you to
+    select a file. A QFile is opened as read-only text; if it cannot
+    be opened, a warning is displayed. The file contents are read into
+    the text editor using \c setText.
+
+    \section2 Saving a File
+
+    The \c save slot writes the current content back to the
+    previously opened file. If no file is open, it delegates to
+    \c saveAs:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto @QSlot final void save
+    \printuntil }
+
+    \section2 Saving a File Under Another Name
+
+    The \c saveAs slot prompts for a new file name and saves the
+    content there:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto @QSlot final void saveAs
+    \printuntil }
+
+    \section2 Printing
+
+    The \c print slot is a placeholder that will be implemented
+    when QPrinter or QPdfWriter support is available in DQt:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto @QSlot final void print
+    \printuntil }
+
+    \section2 Selecting a Font
+
+    The \c selectFont slot opens a font dialog and applies the
+    selected font to the text editor:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto @QSlot final void selectFont
+    \printuntil }
+
+    \section2 Font Formatting Toggles
+
+    The toolbar provides Bold, Italic, and Underline toggle buttons
+    that change the font weight, italic, and underline properties
+    of the text editor:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto @QSlot final void setFontBold
+    \printuntil }
+    \printline
+    \printline
+    \skipto @QSlot final void setFontItalic
+    \printuntil }
+    \printline
+    \printline
+    \skipto @QSlot final void setFontUnderline
+    \printuntil }
+
+    \section2 About Dialog
+
+    The \c about slot displays an informative dialog about the
+    application:
+
+    \quotefromfile tutorials/notepad/notepad.d
+    \skipto @QSlot final void about
+    \printuntil }
+
+    \section2 Copy, Cut, Paste, Undo, and Redo
+
+    These actions delegate directly to the QTextEdit methods.
+    The availability of copy, cut, undo, and redo is managed by
+    connecting the text edit's signals to the corresponding actions:
+
+    \table
+    \header
+        \li Task
+        \li Method called
+    \row
+        \li Copy
+        \li ui.textEdit.copy()
+    \row
+        \li Cut
+        \li ui.textEdit.cut()
+    \row
+        \li Paste
+        \li ui.textEdit.paste()
+    \row
+        \li Undo
+        \li ui.textEdit.undo()
+    \row
+        \li Redo
+        \li ui.textEdit.redo()
+    \endtable
+
+    \section1 Project File
+
+    The project is built with Dub. The dub.json file specifies the
+    project name, dependencies, and build configuration:
+
+    \quotefile tutorials/notepad/dub.json
+
+    The project depends on the \c dqt library which provides the Qt
+    bindings. The \c preBuildCommands entry runs \c rcc to compile
+    the Qt resource file into a binary resource file.
+
+    \b{Learn More}
+
+    \table
+        \header
+            \li About
+            \li Here
+        \row
+            \li Using Qt Designer
+            \li \l{Qt Designer Manual}
+        \row
+            \li Layouts
+            \li \l{Layout Management},
+               \l{Widgets and Layouts},
+               \l{Layout Examples}
+        \row
+            \li The widgets that come with Qt
+            \li \l{Qt Widget Gallery}
+        \row
+            \li Main windows and main window classes
+            \li \l{Application Main Window},
+               \l{Main Window Examples}
+        \row
+            \li QObjects and the Qt Object model
+            \li \l{Object Model}
+        \row
+            \li DQt bindings
+            \li \l{https://github.com/gecko0307/dqt}{DQt on GitHub}
+    \endtable
+
+    \include cli-build-cmake.qdocinc cli-build-cmake
+*/
