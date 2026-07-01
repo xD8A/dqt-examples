@@ -1,0 +1,15 @@
+{
+    "name": "modelview",
+    "description": "Model/View Tutorial - DQt port",
+    "authors": ["dqt-examples"],
+    "targetType": "none",
+    "subPackages": [
+        { "name": "1_readonly", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["1_readonly"], "importPaths": ["1_readonly"], "targetType": "executable", "targetPath": "1_readonly/bin" },
+        { "name": "2_formatting", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["2_formatting"], "importPaths": ["2_formatting"], "targetType": "executable", "targetPath": "2_formatting/bin" },
+        { "name": "3_changingmodel", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["3_changingmodel"], "importPaths": ["3_changingmodel"], "targetType": "executable", "targetPath": "3_changingmodel/bin" },
+        { "name": "4_headers", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["4_headers"], "importPaths": ["4_headers"], "targetType": "executable", "targetPath": "4_headers/bin" },
+        { "name": "5_edit", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["5_edit"], "importPaths": ["5_edit"], "targetType": "executable", "targetPath": "5_edit/bin" },
+        { "name": "6_treeview", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["6_treeview"], "importPaths": ["6_treeview"], "targetType": "executable", "targetPath": "6_treeview/bin" },
+        { "name": "7_selections", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["7_selections"], "importPaths": ["7_selections"], "targetType": "executable", "targetPath": "7_selections/bin" }
+    ]
+}

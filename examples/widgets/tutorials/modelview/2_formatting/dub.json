@@ -1,0 +1,10 @@
+{
+    "name": "mv_part2",
+    "description": "ModelView Tutorial - Part 2 (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": { "dqt:widgets": "*" },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}
