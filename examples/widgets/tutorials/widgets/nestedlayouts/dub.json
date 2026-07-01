@@ -1,0 +1,12 @@
+{
+    "name": "nestedlayouts",
+    "description": "Nested layouts example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}

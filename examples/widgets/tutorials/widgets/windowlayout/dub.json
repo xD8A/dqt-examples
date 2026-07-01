@@ -1,0 +1,12 @@
+{
+    "name": "windowlayout",
+    "description": "Window layout example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}

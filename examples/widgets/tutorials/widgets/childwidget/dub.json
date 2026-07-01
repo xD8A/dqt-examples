@@ -1,0 +1,12 @@
+{
+    "name": "childwidget",
+    "description": "Child widget example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}

@@ -1,0 +1,12 @@
+{
+    "name": "widgets",
+    "description": "Widgets Tutorial - DQt port",
+    "authors": ["dqt-examples"],
+    "targetType": "none",
+    "subPackages": [
+        { "name": "toplevel", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["toplevel"], "importPaths": ["toplevel"], "targetType": "executable", "targetPath": "toplevel/bin" },
+        { "name": "childwidget", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["childwidget"], "importPaths": ["childwidget"], "targetType": "executable", "targetPath": "childwidget/bin" },
+        { "name": "windowlayout", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["windowlayout"], "importPaths": ["windowlayout"], "targetType": "executable", "targetPath": "windowlayout/bin" },
+        { "name": "nestedlayouts", "dependencies": { "dqt:widgets": "*" }, "sourcePaths": ["nestedlayouts"], "importPaths": ["nestedlayouts"], "targetType": "executable", "targetPath": "nestedlayouts/bin" }
+    ]
+}
