@@ -1,0 +1,7 @@
+# Build artifacts
+.dub/
+bin/
+*.exe
+*.o
+*.obj
+*.lst
