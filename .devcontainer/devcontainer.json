@@ -1,0 +1,39 @@
+{
+    "name": "DQt Examples",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined",
+        "--network=host"
+    ],
+    "mounts": [
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
+    ],
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "QT_X11_NO_MITSHM": "1",
+        "QT_QPA_PLATFORM_PLUGIN_PATH": "/opt/qt-6.4.2/plugins",
+        "LIBGL_ALWAYS_SOFTWARE": "1"
+    },
+    "remoteUser": "vscode",
+    "postStartCommand": "chown -R vscode:vscode /vscode",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "webfreak.dlang-bundle"
+            ],
+            "settings": {
+                "d.dmdPath": "dmd",
+                "d.stdlibPath": [
+                    "/dlang/dc/src/druntime/import",
+                    "/dlang/dc/src/phobos",
+                    "/dlang/dc/import"
+                ]
+            }
+        }
+    }
+}

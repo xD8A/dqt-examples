@@ -5,3 +5,15 @@ bin/
 *.o
 *.obj
 *.lst
+
+# Archives
+*.tar
+*.tar.gz
+*.tar.xz
+*.tar.bz2
+*.zip
+*.7z
+*.rar
+*.gz
+*.xz
+*.bz2
