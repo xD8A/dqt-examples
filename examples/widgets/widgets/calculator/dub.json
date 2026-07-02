@@ -1,0 +1,13 @@
+{
+    "name": "calculator",
+    "description": "Calculator example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:gui": "*",
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}
