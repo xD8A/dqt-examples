@@ -1,12 +1,12 @@
 module main;
 
+import core.stdcpp.new_ : cpp_delete, cpp_new;
 import qt.config;
 import qt.helpers;
-import qt.widgets.mainwindow;
-import qt.widgets.textedit;
-import qt.widgets.widget;
-import qt.widgets.menu;
-import qt.widgets.action;
+import qt.widgets.action : QAction;
+import qt.widgets.mainwindow : QMainWindow;
+import qt.widgets.menu : QMenu;
+import qt.widgets.textedit : QTextEdit;
 
 class Notepad : QMainWindow
 {
@@ -15,12 +15,11 @@ class Notepad : QMainWindow
 public:
     this(QWidget parent = null)
     {
-        import core.stdcpp.new_;
-        import qt.widgets.application;
+        import qt.widgets.application : QApplication;
 
         super(parent);
 
-        openAction = cpp_new!QAction(tr("&Open"), this);
+        openAction = cpp_new!QAction(tr("&Load"), this);
         saveAction = cpp_new!QAction(tr("&Save"), this);
         exitAction = cpp_new!QAction(tr("E&xit"), this);
 
@@ -41,13 +40,13 @@ public:
     }
 
 private:
-    @QSlot final void open()
+    @QSlot void open()
     {
-        import core.stdcpp.new_;
-        import qt.core.string;
-        import qt.core.file;
-        import qt.widgets.filedialog;
-        import qt.widgets.messagebox;
+        import qt.core.file : QFile;
+        import qt.core.iodevice : QIODevice;
+        import qt.core.string : QString;
+        import qt.widgets.filedialog : QFileDialog;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto fileName = QFileDialog.getOpenFileName(this, tr("Open File"), "",
             tr("Text Files (*.txt);;C++ Files (*.cpp *.h)"));
@@ -55,23 +54,32 @@ private:
         if (!fileName.isEmpty())
         {
             auto file = cpp_new!QFile(fileName);
-            scope(exit) cpp_delete(file);
-
-            if (!file.open(QFile.OpenMode(QFile.OpenModeFlag.ReadOnly)))
+            scope (exit)
+                cpp_delete(file);
+            if (!file.open(QIODevice.OpenMode.ReadOnly))
             {
                 QMessageBox.critical(this, tr("Error"), tr("Could not open file"));
                 return;
             }
-            textEdit.setPlainText(QString.fromUtf8(file.readAll()));
+            /+
+            TODO: 
+            * QTextStream
+
+            auto in_ = cpp_new!QTextStream(file);
+            scope (exit)
+                cpp_delete(in_);
+            textEdit.setText(in_.readAll());
+            +/
+            textEdit.setText(QString.fromUtf8(file.readAll()));
             file.close();
         }
     }
 
-    @QSlot final void save()
+    @QSlot void save()
     {
-        import core.stdcpp.new_;
-        import qt.core.file;
-        import qt.widgets.filedialog;
+        import qt.core.file : QFile;
+        import qt.core.iodevice : QIODevice;
+        import qt.widgets.filedialog : QFileDialog;
 
         auto fileName = QFileDialog.getSaveFileName(this, tr("Save File"), "",
             tr("Text Files (*.txt);;C++ Files (*.cpp *.h)"));
@@ -79,14 +87,25 @@ private:
         if (!fileName.isEmpty())
         {
             auto file = cpp_new!QFile(fileName);
-            scope(exit) cpp_delete(file);
+            scope (exit)
+                cpp_delete(file);
 
-            if (!file.open(QFile.OpenMode(QFile.OpenModeFlag.WriteOnly)))
+            if (!file.open(QIODevice.OpenModeFlag.WriteOnly))
             {
                 // error message
             }
             else
             {
+                /+
+                TODO: 
+                * QTextStream
+
+                auto stream = cpp_new!QTextStream(file);
+                scope (exit)
+                    cpp_delete(stream);
+                stream << textEdit.toPlainText();
+                stream.flush();
+                +/
                 file.write(textEdit.toPlainText().toUtf8());
                 file.close();
             }
@@ -102,14 +121,14 @@ private:
 
 int main()
 {
-    import core.runtime;
-    import core.stdcpp.new_;
-    import qt.widgets.application;
+    import core.runtime : Runtime;
+    import qt.widgets.application : QApplication;
 
     scope app = new QApplication(Runtime.cArgs.argc, Runtime.cArgs.argv);
 
     auto notepad = cpp_new!Notepad();
-    scope(exit) cpp_delete(notepad);
+    scope (exit)
+        cpp_delete(notepad);
     notepad.show();
 
     return app.exec();

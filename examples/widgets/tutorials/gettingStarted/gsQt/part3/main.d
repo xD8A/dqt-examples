@@ -1,10 +1,11 @@
 module main;
 
+import core.stdcpp.new_ : cpp_delete, cpp_new;
 import qt.config;
 import qt.helpers;
-import qt.widgets.widget;
-import qt.widgets.pushbutton;
-import qt.widgets.textedit;
+import qt.widgets.pushbutton : QPushButton;
+import qt.widgets.textedit : QTextEdit;
+import qt.widgets.widget : QWidget;
 
 class Notepad : QWidget
 {
@@ -13,8 +14,7 @@ class Notepad : QWidget
 public:
     this(QWidget parent = null)
     {
-        import core.stdcpp.new_;
-        import qt.widgets.boxlayout;
+        import qt.widgets.boxlayout : QVBoxLayout;
 
         super(parent);
 
@@ -33,14 +33,14 @@ public:
     }
 
 private:
-    @QSlot final void quit()
+    @QSlot void quit()
     {
-        import core.stdcpp.new_;
-        import qt.widgets.application;
-        import qt.widgets.messagebox;
+        import qt.widgets.application : QApplication;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto msgBox = cpp_new!QMessageBox();
-        scope(exit) cpp_delete(msgBox);
+        scope (exit)
+            cpp_delete(msgBox);
         msgBox.setWindowTitle(tr("Notepad"));
         msgBox.setText(tr("Do you really want to quit?"));
         {
@@ -60,14 +60,14 @@ private:
 
 int main()
 {
-    import core.runtime;
-    import core.stdcpp.new_;
-    import qt.widgets.application;
+    import core.runtime : Runtime;
+    import qt.widgets.application : QApplication;
 
     scope app = new QApplication(Runtime.cArgs.argc, Runtime.cArgs.argv);
 
     auto notepad = cpp_new!Notepad();
-    scope(exit) cpp_delete(notepad);
+    scope (exit)
+        cpp_delete(notepad);
     notepad.show();
 
     return app.exec();

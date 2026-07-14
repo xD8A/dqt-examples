@@ -2,14 +2,14 @@ module main;
 
 int main()
 {
-    import core.runtime;
-    import core.stdcpp.new_;
-    import qt.core.object;
-    import qt.widgets.application;
-    import qt.widgets.boxlayout;
-    import qt.widgets.pushbutton;
-    import qt.widgets.textedit;
-    import qt.widgets.widget;
+    import core.runtime : Runtime;
+    import core.stdcpp.new_ : cpp_new, cpp_delete;
+    import qt.core.object : QObject;
+    import qt.widgets.application : QApplication;
+    import qt.widgets.boxlayout : QVBoxLayout;
+    import qt.widgets.pushbutton : QPushButton;
+    import qt.widgets.textedit : QTextEdit;
+    import qt.widgets.widget : QWidget;
 
     scope app = new QApplication(Runtime.cArgs.argc, Runtime.cArgs.argv);
 
@@ -24,7 +24,8 @@ int main()
 
     auto window = cpp_new!QWidget();
     window.setLayout(layout);
-    scope(exit) cpp_delete(window);
+    scope (exit)
+        cpp_delete(window);
 
     window.show();
 

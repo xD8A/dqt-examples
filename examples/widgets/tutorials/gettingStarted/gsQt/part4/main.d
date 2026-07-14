@@ -1,12 +1,13 @@
 module main;
 
+import core.stdcpp.new_ : cpp_delete, cpp_new;
 import qt.config;
 import qt.helpers;
-import qt.widgets.mainwindow;
-import qt.widgets.textedit;
-import qt.widgets.widget;
-import qt.widgets.menu;
-import qt.widgets.action;
+import qt.widgets.action : QAction;
+import qt.widgets.mainwindow : QMainWindow;
+import qt.widgets.menu : QMenu;
+import qt.widgets.textedit : QTextEdit;
+import qt.widgets.widget : QWidget;
 
 class Notepad : QMainWindow
 {
@@ -15,8 +16,7 @@ class Notepad : QMainWindow
 public:
     this(QWidget parent = null)
     {
-        import core.stdcpp.new_;
-        import qt.widgets.application;
+        import qt.widgets.application : QApplication;
 
         super(parent);
 
@@ -41,11 +41,11 @@ public:
     }
 
 private:
-    @QSlot final void load()
+    @QSlot void load()
     {
     }
 
-    @QSlot final void save()
+    @QSlot void save()
     {
     }
 
@@ -58,14 +58,14 @@ private:
 
 int main()
 {
-    import core.runtime;
-    import core.stdcpp.new_;
-    import qt.widgets.application;
+    import core.runtime : Runtime;
+    import qt.widgets.application : QApplication;
 
     scope app = new QApplication(Runtime.cArgs.argc, Runtime.cArgs.argv);
 
     auto notepad = cpp_new!Notepad();
-    scope(exit) cpp_delete(notepad);
+    scope (exit)
+        cpp_delete(notepad);
     notepad.show();
 
     return app.exec();
