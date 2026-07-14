@@ -1,14 +1,12 @@
 module finddialog;
 
 import qt.config;
+import qt.core.string : QString;
 import qt.helpers;
-import qt.widgets.dialog;
-import qt.widgets.label;
-import qt.widgets.lineedit;
-import qt.widgets.pushbutton;
-import qt.widgets.widget;
-import qt.widgets.boxlayout;
-import qt.core.string;
+import qt.widgets.dialog : QDialog;
+import qt.widgets.lineedit : QLineEdit;
+import qt.widgets.pushbutton : QPushButton;
+import qt.widgets.widget : QWidget;
 
 class FindDialog : QDialog
 {
@@ -17,7 +15,9 @@ class FindDialog : QDialog
 public:
     this(QWidget parent = null)
     {
-        import core.stdcpp.new_;
+        import core.stdcpp.new_ : cpp_new;
+        import qt.widgets.boxlayout : QHBoxLayout;
+        import qt.widgets.label : QLabel;
 
         super(parent);
 
@@ -41,7 +41,7 @@ public:
 
     @QSlot final void findClicked()
     {
-        import qt.widgets.messagebox;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto text = lineEdit.text();
         if (text.isEmpty())

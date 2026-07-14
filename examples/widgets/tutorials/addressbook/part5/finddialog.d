@@ -1,23 +1,25 @@
+//! [FindDialog header]
 module finddialog;
 
 import qt.config;
+import qt.core.string : QString;
 import qt.helpers;
-import qt.widgets.dialog;
-import qt.widgets.label;
-import qt.widgets.lineedit;
-import qt.widgets.pushbutton;
-import qt.widgets.widget;
-import qt.widgets.boxlayout;
-import qt.core.string;
+import qt.widgets.dialog : QDialog;
+import qt.widgets.lineedit : QLineEdit;
+import qt.widgets.pushbutton : QPushButton;
+import qt.widgets.widget : QWidget;
 
 class FindDialog : QDialog
 {
     mixin(Q_OBJECT_D);
 
 public:
+    //! [constructor]
     this(QWidget parent = null)
     {
-        import core.stdcpp.new_;
+        import core.stdcpp.new_ : cpp_new;
+        import qt.widgets.boxlayout : QHBoxLayout;
+        import qt.widgets.label : QLabel;
 
         super(parent);
 
@@ -38,10 +40,12 @@ public:
         connect(findButton.signal!"clicked", this.slot!"findClicked");
         connect(findButton.signal!"clicked", this.slot!"accept");
     }
+    //! [constructor]
 
+    //! [findClicked() function]
     @QSlot final void findClicked()
     {
-        import qt.widgets.messagebox;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto text = lineEdit.text();
         if (text.isEmpty())
@@ -57,14 +61,18 @@ public:
             hide();
         }
     }
+    //! [findClicked() function]
 
+    //! [getFindText() function]
     QString getFindText()
     {
         return findText;
     }
+    //! [getFindText() function]
 
 private:
     QPushButton findButton;
     QLineEdit lineEdit;
     QString findText;
 }
+//! [FindDialog header]

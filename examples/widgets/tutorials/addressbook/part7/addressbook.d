@@ -1,33 +1,35 @@
 module addressbook;
 
 import qt.config;
+import qt.core.string : QString;
 import qt.helpers;
-import qt.widgets.widget;
-import qt.widgets.label;
-import qt.widgets.lineedit;
-import qt.widgets.textedit;
-import qt.widgets.pushbutton;
-import qt.widgets.gridlayout;
-import qt.widgets.boxlayout;
-import qt.widgets.messagebox;
-import qt.widgets.filedialog;
-import qt.core.string;
-import qt.core.bytearray;
-import qt.core.file;
-import qt.core.datastream;
+import qt.widgets.lineedit : QLineEdit;
+import qt.widgets.pushbutton : QPushButton;
+import qt.widgets.textedit : QTextEdit;
+import qt.widgets.widget : QWidget;
 
-import finddialog;
+import finddialog : FindDialog;
 
 class AddressBook : QWidget
 {
     mixin(Q_OBJECT_D);
 
-    enum Mode { NavigationMode, AddingMode, EditingMode }
+public:
+
+    enum Mode
+    {
+        NavigationMode,
+        AddingMode,
+        EditingMode
+    }
 
     this(QWidget parent = null)
     {
-        import core.stdcpp.new_;
-        import qt.core.namespace;
+        import core.stdcpp.new_ : cpp_new;
+        import qt.core.namespace : Alignment, AlignmentFlag;
+        import qt.widgets.boxlayout : QHBoxLayout, QVBoxLayout;
+        import qt.widgets.gridlayout : QGridLayout;
+        import qt.widgets.label : QLabel;
 
         super(parent);
 
@@ -45,10 +47,8 @@ class AddressBook : QWidget
         editButton.setEnabled(false);
         removeButton = cpp_new!QPushButton(tr("&Remove"));
         removeButton.setEnabled(false);
-
         findButton = cpp_new!QPushButton(tr("&Find"));
         findButton.setEnabled(false);
-
         submitButton = cpp_new!QPushButton(tr("&Submit"));
         submitButton.hide();
         cancelButton = cpp_new!QPushButton(tr("&Cancel"));
@@ -132,6 +132,8 @@ class AddressBook : QWidget
 
     @QSlot final void submitContact()
     {
+        import qt.widgets.messagebox : QMessageBox;
+
         auto name = nameLine.text();
         auto address = addressText.toPlainText();
 
@@ -142,44 +144,45 @@ class AddressBook : QWidget
             return;
         }
 
+        string nameStr = name.toUtf8().toConstCharArray().idup;
+        string oldNameStr = oldName.toUtf8().toConstCharArray().idup;
         if (currentMode == Mode.AddingMode)
         {
-            auto nameStr = qsToStr(name);
-            if (nameStr in contacts)
+            if (nameStr !in contacts)
             {
-                QMessageBox.information(this, tr("Add Unsuccessful"),
-                    tr("Sorry, \"%1\" is already in your address book.").arg(name));
+                contacts[nameStr] = address; // TODO: contacts.insert(name, address);
+                QMessageBox.information(this, tr("Add Successful"),
+                    tr("\"%1\" has been added to your address book.").arg(name));
             }
             else
             {
-                contacts[nameStr] = qsToStr(address);
-                QMessageBox.information(this, tr("Add Successful"),
-                    tr("\"%1\" has been added to your address book.").arg(name));
+                QMessageBox.information(this, tr("Add Unsuccessful"),
+                    tr("Sorry, \"%1\" is already in your address book.").arg(name));
+
             }
         }
         else if (currentMode == Mode.EditingMode)
         {
             if (oldName != name)
             {
-                auto nameStr = qsToStr(name);
-                if (nameStr in contacts)
+                if (nameStr !in contacts)
+                {
+                    QMessageBox.information(this, tr("Edit Successful"),
+                        tr("\"%1\" has been edited in your address book.").arg(oldName));
+                    contacts.remove(oldNameStr);
+                    contacts[nameStr] = address; // TODO: contacts.insert(name, address);
+                }
+                else
                 {
                     QMessageBox.information(this, tr("Edit Unsuccessful"),
                         tr("Sorry, \"%1\" is already in your address book.").arg(name));
                 }
-                else
-                {
-                    contacts.remove(qsToStr(oldName));
-                    contacts[nameStr] = qsToStr(address);
-                    QMessageBox.information(this, tr("Edit Successful"),
-                        tr("\"%1\" has been edited in your address book.").arg(oldName));
-                }
             }
             else if (oldAddress != address)
             {
-                contacts[qsToStr(name)] = qsToStr(address);
                 QMessageBox.information(this, tr("Edit Successful"),
                     tr("\"%1\" has been edited in your address book.").arg(name));
+                contacts[nameStr] = address;
             }
         }
 
@@ -195,15 +198,18 @@ class AddressBook : QWidget
 
     @QSlot final void removeContact()
     {
+        import qt.widgets.messagebox : QMessageBox;
+
         auto name = nameLine.text();
-        auto nameStr = qsToStr(name);
+        // auto address = addressText.toPlainText();
+        string nameStr = name.toUtf8().toConstCharArray().idup;
 
         if (nameStr in contacts)
         {
-            auto button = QMessageBox.question(this,
-                tr("Confirm Remove"),
-                tr("Are you sure you want to remove \"%1\"?").arg(name),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No);
+            immutable auto button = QMessageBox.question(this, tr("Confirm Remove"),
+                tr("Are you sure you want to remove \"%1\"?")
+                    .arg(name),
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No);
 
             if (button == QMessageBox.StandardButton.Yes)
             {
@@ -211,7 +217,7 @@ class AddressBook : QWidget
                 contacts.remove(nameStr);
 
                 QMessageBox.information(this, tr("Remove Successful"),
-                    tr("\"%1\" has been removed from your address book.").arg(name));
+                    tr("\"%1\" has been removed from your address book.").arg(nameLine.text()));
             }
         }
 
@@ -220,80 +226,98 @@ class AddressBook : QWidget
 
     @QSlot final void next()
     {
-        import std.array;
-        import std.algorithm.sorting;
+        import std.algorithm.sorting : sort;
+        import std.array : array;
+        import std.range : assumeSorted, empty;
 
-        auto name = qsToStr(nameLine.text());
-        auto keys = contacts.keys;
-        keys.sort; // QMap stores keys in sorted order; D's AA keys need explicit sort for deterministic navigation
+        QString name = nameLine.text();
+        /+ 
+        TODO:
+        * QMap
 
-        if (keys.length == 0)
+        auto i = contacts.find(name);
+
+        if (i != contacts.end())
+            i++;
+
+        if (i == contacts.end())
+            i = contacts.begin();
+
+        nameLine.setText(i.key());
+        addressText.setText(i.value());
+        +/
+        auto keys = contacts.byKey().array();
+        keys.sort();
+        if (keys.empty)
             return;
 
-        size_t idx = keys.length - 1;
-        foreach (i, k; keys)
-        {
-            if (k == name)
-            {
-                idx = i;
-                break;
-            }
-        }
-        idx++;
-        if (idx >= keys.length)
-            idx = 0;
-
-        nameLine.setText(QString(keys[idx]));
-        addressText.setText(QString(contacts[keys[idx]]));
+        string nameStr = name.toUtf8().toConstCharArray().idup;
+        auto r = assumeSorted(keys).trisect(nameStr);
+        string nextKey = (!r[1].empty && !r[2].empty) ? r[2][0] : keys[0];
+        nameLine.setText(QString(nextKey));
+        addressText.setText(contacts[nextKey]);
     }
 
     @QSlot final void previous()
     {
-        import std.array;
-        import std.algorithm.sorting;
+        import std.algorithm.sorting : sort;
+        import std.array : array;
+        import std.range : assumeSorted, empty;
 
-        auto name = qsToStr(nameLine.text());
-        auto keys = contacts.keys;
-        keys.sort; // QMap stores keys in sorted order; D's AA keys need explicit sort for deterministic navigation
+        QString name = nameLine.text();
 
-        if (keys.length == 0)
+        /+ 
+        TODO:
+        * QMap
+
+        auto i = contacts.find(name);
+
+        if (i == contacts.end()){
+            nameLine.clear();
+            addressText.clear();
+            return;
+        }
+
+        if (i == contacts.begin())
+            i = contacts.end();
+
+        i--;
+        nameLine.setText(i.key());
+        addressText.setText(i.value());
+        +/
+        auto keys = contacts.byKey().array();
+        keys.sort();
+
+        string nameStr = name.toUtf8().toConstCharArray().idup; // TODO: QString.toDString?        
+        auto r = assumeSorted(keys).trisect(nameStr);
+        if (r[1].empty)
         {
             nameLine.clear();
             addressText.clear();
             return;
         }
 
-        size_t idx = 0;
-        foreach (i, k; keys)
-        {
-            if (k == name)
-            {
-                idx = i;
-                break;
-            }
-        }
-
-        if (idx == 0)
-            idx = keys.length - 1;
-        else
-            idx--;
-
-        nameLine.setText(QString(keys[idx]));
-        addressText.setText(QString(contacts[keys[idx]]));
+        string prevKey = (!r[0].empty) ? r[0][$ - 1] : keys[$ - 1];
+        nameLine.setText(QString(prevKey));
+        addressText.setText(contacts[prevKey]);
     }
 
     @QSlot final void findContact()
     {
+        import qt.widgets.dialog : QDialog;
+        import qt.widgets.messagebox : QMessageBox;
+
         dialog.show();
 
-        if (dialog.exec() == 1)
+        if (dialog.exec() == QDialog.DialogCode.Accepted)
         {
             auto contactName = dialog.getFindText();
+            string contactNameStr = contactName.toUtf8().toConstCharArray().idup;
 
-            if (qsToStr(contactName) in contacts)
+            if (contactNameStr in contacts)
             {
                 nameLine.setText(contactName);
-                addressText.setText(QString(contacts[qsToStr(contactName)]));
+                addressText.setText(contacts[contactNameStr]);
             }
             else
             {
@@ -308,7 +332,12 @@ class AddressBook : QWidget
 
     @QSlot final void saveToFile()
     {
-        import core.stdcpp.new_;
+        import core.stdcpp.new_ : cpp_new, cpp_delete;
+        import qt.core.datastream : QDataStream;
+        import qt.core.file : QFile;
+        import qt.core.iodevice : QIODevice;
+        import qt.widgets.filedialog : QFileDialog;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto fileName = QFileDialog.getSaveFileName(this,
             tr("Save Address Book"), "",
@@ -318,21 +347,27 @@ class AddressBook : QWidget
             return;
 
         auto file = cpp_new!QFile(fileName);
-        scope(exit) cpp_delete(file);
+        scope (exit)
+            cpp_delete(file);
 
-        if (!file.open(QFile.OpenMode(QFile.OpenModeFlag.WriteOnly)))
+        if (!file.open(QIODevice.OpenMode.WriteOnly))
         {
             QMessageBox.information(this, tr("Unable to open file"),
                 file.errorString());
             return;
         }
 
-        auto dataOut = cpp_new!QDataStream(file);
-        scope(exit) cpp_delete(dataOut);
-        dataOut.setVersion(QDataStream.Version.Qt_4_3);
+        auto out_ = cpp_new!QDataStream(file);
+        scope (exit)
+            cpp_delete(out_);
+        out_.setVersion(QDataStream.Version.Qt_4_5);
 
-        auto count = cast(int)contacts.length;
-        dataOut.writeRawData(cast(const(char)*)&count, cast(int)int.sizeof);
+        /+ 
+        TODO:
+        * operator<< (QDataStream, const QMap!(QString, QString));
+        +/
+        auto count = cast(int) contacts.length;
+        out_.writeRawData(cast(const(char)*)&count, cast(int) int.sizeof);
 
         foreach (name, address; contacts)
         {
@@ -340,18 +375,23 @@ class AddressBook : QWidget
             auto addrBA = QString(address).toUtf8();
 
             auto nameLen = nameBA.length;
-            dataOut.writeRawData(cast(const(char)*)&nameLen, cast(int)int.sizeof);
-            dataOut.writeRawData(nameBA.constData(), cast(int)nameLen);
+            out_.writeRawData(cast(const(char)*)&nameLen, cast(int) int.sizeof);
+            out_.writeRawData(nameBA.constData(), cast(int) nameLen);
 
             auto addrLen = addrBA.length;
-            dataOut.writeRawData(cast(const(char)*)&addrLen, cast(int)int.sizeof);
-            dataOut.writeRawData(addrBA.constData(), cast(int)addrLen);
+            out_.writeRawData(cast(const(char)*)&addrLen, cast(int) int.sizeof);
+            out_.writeRawData(addrBA.constData(), cast(int) addrLen);
         }
     }
 
     @QSlot final void loadFromFile()
     {
-        import core.stdcpp.new_;
+        import core.stdcpp.new_ : cpp_new, cpp_delete;
+        import qt.core.datastream : QDataStream;
+        import qt.core.file : QFile;
+        import qt.core.iodevice : QIODevice;
+        import qt.widgets.filedialog : QFileDialog;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto fileName = QFileDialog.getOpenFileName(this,
             tr("Open Address Book"), "",
@@ -361,9 +401,10 @@ class AddressBook : QWidget
             return;
 
         auto file = cpp_new!QFile(fileName);
-        scope(exit) cpp_delete(file);
+        scope (exit)
+            cpp_delete(file);
 
-        if (!file.open(QFile.OpenMode(QFile.OpenModeFlag.ReadOnly)))
+        if (!file.open(QIODevice.OpenMode.ReadOnly))
         {
             QMessageBox.information(this, tr("Unable to open file"),
                 file.errorString());
@@ -371,35 +412,40 @@ class AddressBook : QWidget
         }
 
         auto dataIn = cpp_new!QDataStream(file);
-        scope(exit) cpp_delete(dataIn);
-        dataIn.setVersion(QDataStream.Version.Qt_4_3);
+        scope (exit)
+            cpp_delete(dataIn);
+        dataIn.setVersion(QDataStream.Version.Qt_4_5);
 
         contacts.clear();
-
+        /+ 
+        TODO:
+        * operator>> (const QDataStream, QMap!(QString, QString));
+        +/
         int count;
-        dataIn.readRawData(cast(char*)&count, cast(int)int.sizeof);
+        dataIn.readRawData(cast(char*)&count, cast(int) int.sizeof);
 
         for (int i = 0; i < count; i++)
         {
             int nameLen;
-            dataIn.readRawData(cast(char*)&nameLen, cast(int)int.sizeof);
+            dataIn.readRawData(cast(char*)&nameLen, cast(int) int.sizeof);
             auto nameBuf = new char[nameLen];
             dataIn.readRawData(nameBuf.ptr, nameLen);
             string name = nameBuf[0 .. nameLen].idup;
 
             int addrLen;
-            dataIn.readRawData(cast(char*)&addrLen, cast(int)int.sizeof);
+            dataIn.readRawData(cast(char*)&addrLen, cast(int) int.sizeof);
             auto addrBuf = new char[addrLen];
             dataIn.readRawData(addrBuf.ptr, addrLen);
             string address = addrBuf[0 .. addrLen].idup;
 
-            contacts[name] = address;
+            contacts[name] = QString(address);
         }
 
         if (contacts.length > 0)
         {
             auto keys = contacts.keys;
             import std.algorithm.sorting;
+
             keys.sort; // QMap stores keys in sorted order; D's AA keys need explicit sort for deterministic navigation
             nameLine.setText(QString(keys[0]));
             addressText.setText(QString(contacts[keys[0]]));
@@ -408,25 +454,36 @@ class AddressBook : QWidget
         updateInterface(Mode.NavigationMode);
     }
 
+    //! [exportAsVCard() declaration]
+    //! [export function part1]
     @QSlot final void exportAsVCard()
     {
-        import core.stdcpp.new_;
-        import qt.core.namespace;
+        import core.stdcpp.new_ : cpp_new, cpp_delete;
+        import qt.core.file : QFile;
+        import qt.core.iodevice : QIODevice;
+        import qt.core.namespace : CaseSensitivity, SplitBehavior, SplitBehaviorFlags;
+        import qt.core.regularexpression : QRegularExpression;
+        import qt.core.string : QLatin1String;
+        import qt.core.stringlist : QStringList;
+        import qt.widgets.filedialog : QFileDialog;
+        import qt.widgets.messagebox : QMessageBox;
+        import std.algorithm : map;
+        import std.array : join;
 
-        auto name = nameLine.text();
-        auto address = addressText.toPlainText();
-
-        if (name.isEmpty())
-            return;
-
+        QString name = nameLine.text();
+        QString address = addressText.toPlainText();
         QString firstName;
         QString lastName;
+        QStringList nameList;
 
-        auto idx = name.indexOf(QLatin1String(" "));
-        if (idx != -1)
+        immutable auto index = name.indexOf(QLatin1String(" "));
+
+        if (index != -1)
         {
-            firstName = name.left(idx);
-            lastName = name.mid(idx + 1);
+            nameList = name.split(QRegularExpression("\\s+"), SplitBehavior(
+                    SplitBehaviorFlags.SkipEmptyParts));
+            firstName = nameList.first();
+            lastName = *(nameList.end() - 1); // TODO: QList.last()
         }
         else
         {
@@ -434,47 +491,83 @@ class AddressBook : QWidget
             lastName = QString.create();
         }
 
-        QString fileName = QFileDialog.getSaveFileName(this,
-            tr("Export Contact"), "",
-            tr("vCard Files (*.vcf);;All Files (*)"));
+        QString fileName = QFileDialog.getSaveFileName(this, tr("Export Contact"), "", tr(
+                "vCard Files (*.vcf);;All Files (*)"));
 
         if (fileName.isEmpty())
             return;
 
         auto file = cpp_new!QFile(fileName);
-        scope(exit) cpp_delete(file);
+        scope (exit)
+            cpp_delete(file);
+        //! [export function part1]
 
-        if (!file.open(QFile.OpenMode(QFile.OpenModeFlag.WriteOnly)))
+        //! [export function part2]
+        if (!file.open(QIODevice.OpenMode.WriteOnly))
         {
             QMessageBox.information(this, tr("Unable to open file"),
                 file.errorString());
             return;
         }
+        //! [export function part2]
 
-        auto lastNameStr = qsToStr(lastName);
-        auto firstNameStr = qsToStr(firstName);
-        auto nameStr = qsToStr(name);
+        /+ 
+        TODO:
+         * QTextStream
 
+        auto out_ = cpp_new!QTextStream(file);
+        scope (exit)
+            cpp_delete(_out);
+
+        out_ << "BEGIN:VCARD" << '\n';
+        out_ << "VERSION:2.1" << '\n';
+        out_ << "N:" << lastName << ';' << firstName << '\n';
+
+        if (!nameList.isEmpty())
+            out_ << "FN:" << nameList.join(' ') << '\n';
+        else
+            out_ << "FN:" << firstName << '\n';
+
+        address.replace(";", "\\;", CaseSensitivity.CaseInsensitive);
+        address.replace('\n', ";", CaseSensitivity.CaseInsensitive);
+        address.replace(",", " ", CaseSensitivity.CaseInsensitive);
+
+        out_ << "ADR;HOME:;" << address << '\n';
+        out_ << "END:VCARD" << '\n';
+        +/
+
+        //! [export function part3]
         file.write("BEGIN:VCARD\n");
         file.write("VERSION:2.1\n");
-        file.write(QString("N:" ~ lastNameStr ~ ";" ~ firstNameStr ~ ";;;\n").toUtf8());
-        file.write(QString("FN:" ~ nameStr ~ "\n").toUtf8());
+        auto lastNameStr = lastName.toUtf8().toConstCharArray().idup;
+        auto firstNameStr = firstName.toUtf8().toConstCharArray().idup;
+        file.write(QString("N:" ~ lastNameStr ~ ";" ~ firstNameStr ~ "\n").toUtf8());
+        if (!nameList.isEmpty())
+            file.write(QString("FN:" ~ nameList[].map!(n => n.toUtf8()
+                    .toConstCharArray().idup).join(' ') ~ "\n").toUtf8());
+        else
+            file.write(QString("FN:" ~ firstNameStr ~ "\n").toUtf8());
+        //! [export function part3]
 
+        //! [export function part4]
         address.replace(QLatin1String(";"), QLatin1String("\\;"), CaseSensitivity.CaseInsensitive);
         address.replace(QLatin1String("\n"), QLatin1String(";"), CaseSensitivity.CaseInsensitive);
         address.replace(QLatin1String(","), QLatin1String(" "), CaseSensitivity.CaseInsensitive);
 
-        auto addressStr = qsToStr(address);
-        file.write(QString("ADR;HOME:;" ~ addressStr ~ "\n").toUtf8());
-        file.write("END:VCARD\n");
+        file.write(QString("ADR;HOME:;" ~ address.toUtf8().toConstCharArray().idup ~ "\n").toUtf8());
+        file.write(QString("END:VCARD" ~ "\n").toUtf8());
 
         QMessageBox.information(this, tr("Export Successful"),
             tr("\"%1\" has been exported as a vCard.").arg(name));
     }
+    //! [export function part4]
+    //! [exportAsVCard() declaration]
+
+private:
 
     void updateInterface(Mode mode)
     {
-        import qt.core.namespace;
+        import qt.core.namespace : FocusReason;
 
         currentMode = mode;
 
@@ -498,11 +591,12 @@ class AddressBook : QWidget
 
             loadButton.setEnabled(false);
             saveButton.setEnabled(false);
+
             exportButton.setEnabled(false);
             break;
 
         case Mode.NavigationMode:
-            if (contacts.length == 0)
+            if (contacts.length == 0) // TODO: QMap.isEmpty()
             {
                 nameLine.clear();
                 addressText.clear();
@@ -515,7 +609,6 @@ class AddressBook : QWidget
             auto number = contacts.length;
             editButton.setEnabled(number >= 1);
             removeButton.setEnabled(number >= 1);
-            findButton.setEnabled(number > 2);
             nextButton.setEnabled(number > 1);
             previousButton.setEnabled(number > 1);
 
@@ -533,11 +626,6 @@ class AddressBook : QWidget
         }
     }
 
-    static string qsToStr(QString qs)
-    {
-        return qs.toUtf8().toConstCharArray().idup;
-    }
-
     QPushButton addButton;
     QPushButton editButton;
     QPushButton removeButton;
@@ -548,11 +636,13 @@ class AddressBook : QWidget
     QPushButton previousButton;
     QPushButton loadButton;
     QPushButton saveButton;
+    //! [exportButton declaration]
     QPushButton exportButton;
+    //! [exportButton declaration]
     QLineEdit nameLine;
     QTextEdit addressText;
 
-    string[string] contacts;
+    QString[string] contacts; // TODO: QMap!(QString, QString) contacts;
     FindDialog dialog;
     QString oldName;
     QString oldAddress;

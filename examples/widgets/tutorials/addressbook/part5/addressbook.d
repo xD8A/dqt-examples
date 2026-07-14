@@ -1,30 +1,35 @@
 module addressbook;
 
 import qt.config;
+import qt.core.string : QString;
 import qt.helpers;
-import qt.widgets.widget;
-import qt.widgets.label;
-import qt.widgets.lineedit;
-import qt.widgets.textedit;
-import qt.widgets.pushbutton;
-import qt.widgets.gridlayout;
-import qt.widgets.boxlayout;
-import qt.widgets.messagebox;
-import qt.core.string;
-import qt.core.bytearray;
+import qt.widgets.lineedit : QLineEdit;
+import qt.widgets.pushbutton : QPushButton;
+import qt.widgets.textedit : QTextEdit;
+import qt.widgets.widget : QWidget;
 
-import finddialog;
+import finddialog : FindDialog;
 
 class AddressBook : QWidget
 {
     mixin(Q_OBJECT_D);
 
-    enum Mode { NavigationMode, AddingMode, EditingMode }
+public:
+
+    enum Mode
+    {
+        NavigationMode,
+        AddingMode,
+        EditingMode
+    }
 
     this(QWidget parent = null)
     {
-        import core.stdcpp.new_;
-        import qt.core.namespace;
+        import core.stdcpp.new_ : cpp_new;
+        import qt.core.namespace : Alignment, AlignmentFlag;
+        import qt.widgets.boxlayout : QHBoxLayout, QVBoxLayout;
+        import qt.widgets.gridlayout : QGridLayout;
+        import qt.widgets.label : QLabel;
 
         super(parent);
 
@@ -42,10 +47,10 @@ class AddressBook : QWidget
         editButton.setEnabled(false);
         removeButton = cpp_new!QPushButton(tr("&Remove"));
         removeButton.setEnabled(false);
-
+        //! [instantiating findButton]
         findButton = cpp_new!QPushButton(tr("&Find"));
         findButton.setEnabled(false);
-
+        //! [instantiating findButton]
         submitButton = cpp_new!QPushButton(tr("&Submit"));
         submitButton.hide();
         cancelButton = cpp_new!QPushButton(tr("&Cancel"));
@@ -56,14 +61,18 @@ class AddressBook : QWidget
         previousButton = cpp_new!QPushButton(tr("&Previous"));
         previousButton.setEnabled(false);
 
+        //! [instantiating FindDialog]
         dialog = cpp_new!FindDialog(this);
+        //! [instantiating FindDialog]
 
         connect(addButton.signal!"clicked", this.slot!"addContact");
         connect(submitButton.signal!"clicked", this.slot!"submitContact");
         connect(editButton.signal!"clicked", this.slot!"editContact");
         connect(removeButton.signal!"clicked", this.slot!"removeContact");
         connect(cancelButton.signal!"clicked", this.slot!"cancel");
+        //! [signals and slots for find]
         connect(findButton.signal!"clicked", this.slot!"findContact");
+        //! [signals and slots for find]
         connect(nextButton.signal!"clicked", this.slot!"next");
         connect(previousButton.signal!"clicked", this.slot!"previous");
 
@@ -71,7 +80,9 @@ class AddressBook : QWidget
         buttonLayout1.addWidget(addButton);
         buttonLayout1.addWidget(editButton);
         buttonLayout1.addWidget(removeButton);
+        //! [adding findButton to layout]
         buttonLayout1.addWidget(findButton);
+        //! [adding findButton to layout]
         buttonLayout1.addWidget(submitButton);
         buttonLayout1.addWidget(cancelButton);
         buttonLayout1.addStretch();
@@ -113,6 +124,8 @@ class AddressBook : QWidget
 
     @QSlot final void submitContact()
     {
+        import qt.widgets.messagebox : QMessageBox;
+
         auto name = nameLine.text();
         auto address = addressText.toPlainText();
 
@@ -123,44 +136,45 @@ class AddressBook : QWidget
             return;
         }
 
+        string nameStr = name.toUtf8().toConstCharArray().idup;
+        string oldNameStr = oldName.toUtf8().toConstCharArray().idup;
         if (currentMode == Mode.AddingMode)
         {
-            auto nameStr = qsToStr(name);
-            if (nameStr in contacts)
+            if (nameStr !in contacts)
             {
-                QMessageBox.information(this, tr("Add Unsuccessful"),
-                    tr("Sorry, \"%1\" is already in your address book.").arg(name));
+                contacts[nameStr] = address; // TODO: contacts.insert(name, address);
+                QMessageBox.information(this, tr("Add Successful"),
+                    tr("\"%1\" has been added to your address book.").arg(name));
             }
             else
             {
-                contacts[nameStr] = qsToStr(address);
-                QMessageBox.information(this, tr("Add Successful"),
-                    tr("\"%1\" has been added to your address book.").arg(name));
+                QMessageBox.information(this, tr("Add Unsuccessful"),
+                    tr("Sorry, \"%1\" is already in your address book.").arg(name));
+
             }
         }
         else if (currentMode == Mode.EditingMode)
         {
             if (oldName != name)
             {
-                auto nameStr = qsToStr(name);
-                if (nameStr in contacts)
+                if (nameStr !in contacts)
+                {
+                    QMessageBox.information(this, tr("Edit Successful"),
+                        tr("\"%1\" has been edited in your address book.").arg(oldName));
+                    contacts.remove(oldNameStr);
+                    contacts[nameStr] = address; // TODO: contacts.insert(name, address);
+                }
+                else
                 {
                     QMessageBox.information(this, tr("Edit Unsuccessful"),
                         tr("Sorry, \"%1\" is already in your address book.").arg(name));
                 }
-                else
-                {
-                    contacts.remove(qsToStr(oldName));
-                    contacts[nameStr] = qsToStr(address);
-                    QMessageBox.information(this, tr("Edit Successful"),
-                        tr("\"%1\" has been edited in your address book.").arg(oldName));
-                }
             }
             else if (oldAddress != address)
             {
-                contacts[qsToStr(name)] = qsToStr(address);
                 QMessageBox.information(this, tr("Edit Successful"),
                     tr("\"%1\" has been edited in your address book.").arg(name));
+                contacts[nameStr] = address;
             }
         }
 
@@ -176,15 +190,18 @@ class AddressBook : QWidget
 
     @QSlot final void removeContact()
     {
+        import qt.widgets.messagebox : QMessageBox;
+
         auto name = nameLine.text();
-        auto nameStr = qsToStr(name);
+        // auto address = addressText.toPlainText();
+        string nameStr = name.toUtf8().toConstCharArray().idup;
 
         if (nameStr in contacts)
         {
-            auto button = QMessageBox.question(this,
-                tr("Confirm Remove"),
-                tr("Are you sure you want to remove \"%1\"?").arg(name),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No);
+            immutable auto button = QMessageBox.question(this, tr("Confirm Remove"),
+                tr("Are you sure you want to remove \"%1\"?")
+                    .arg(name),
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No);
 
             if (button == QMessageBox.StandardButton.Yes)
             {
@@ -192,7 +209,7 @@ class AddressBook : QWidget
                 contacts.remove(nameStr);
 
                 QMessageBox.information(this, tr("Remove Successful"),
-                    tr("\"%1\" has been removed from your address book.").arg(name));
+                    tr("\"%1\" has been removed from your address book.").arg(nameLine.text()));
             }
         }
 
@@ -201,80 +218,100 @@ class AddressBook : QWidget
 
     @QSlot final void next()
     {
-        import std.array;
-        import std.algorithm.sorting;
+        import std.algorithm.sorting : sort;
+        import std.array : array;
+        import std.range : assumeSorted, empty;
 
-        auto name = qsToStr(nameLine.text());
-        auto keys = contacts.keys;
-        keys.sort; // QMap stores keys in sorted order; D's AA keys need explicit sort for deterministic navigation
+        QString name = nameLine.text();
+        /+ 
+        TODO:
+        * QMap
 
-        if (keys.length == 0)
+        auto i = contacts.find(name);
+
+        if (i != contacts.end())
+            i++;
+
+        if (i == contacts.end())
+            i = contacts.begin();
+
+        nameLine.setText(i.key());
+        addressText.setText(i.value());
+        +/
+        auto keys = contacts.byKey().array();
+        keys.sort();
+        if (keys.empty)
             return;
 
-        size_t idx = keys.length - 1;
-        foreach (i, k; keys)
-        {
-            if (k == name)
-            {
-                idx = i;
-                break;
-            }
-        }
-        idx++;
-        if (idx >= keys.length)
-            idx = 0;
-
-        nameLine.setText(QString(keys[idx]));
-        addressText.setText(QString(contacts[keys[idx]]));
+        string nameStr = name.toUtf8().toConstCharArray().idup;
+        auto r = assumeSorted(keys).trisect(nameStr);
+        string nextKey = (!r[1].empty && !r[2].empty) ? r[2][0] : keys[0];
+        nameLine.setText(QString(nextKey));
+        addressText.setText(contacts[nextKey]);
     }
 
     @QSlot final void previous()
     {
-        import std.array;
-        import std.algorithm.sorting;
+        import std.algorithm.sorting : sort;
+        import std.array : array;
+        import std.range : assumeSorted, empty;
 
-        auto name = qsToStr(nameLine.text());
-        auto keys = contacts.keys;
-        keys.sort; // QMap stores keys in sorted order; D's AA keys need explicit sort for deterministic navigation
+        QString name = nameLine.text();
 
-        if (keys.length == 0)
+        /+ 
+        TODO:
+        * QMap
+
+        auto i = contacts.find(name);
+
+        if (i == contacts.end()){
+            nameLine.clear();
+            addressText.clear();
+            return;
+        }
+
+        if (i == contacts.begin())
+            i = contacts.end();
+
+        i--;
+        nameLine.setText(i.key());
+        addressText.setText(i.value());
+        +/
+        auto keys = contacts.byKey().array();
+        keys.sort();
+
+        string nameStr = name.toUtf8().toConstCharArray().idup; // TODO: QString.toDString?        
+        auto r = assumeSorted(keys).trisect(nameStr);
+        if (r[1].empty)
         {
             nameLine.clear();
             addressText.clear();
             return;
         }
 
-        size_t idx = 0;
-        foreach (i, k; keys)
-        {
-            if (k == name)
-            {
-                idx = i;
-                break;
-            }
-        }
-
-        if (idx == 0)
-            idx = keys.length - 1;
-        else
-            idx--;
-
-        nameLine.setText(QString(keys[idx]));
-        addressText.setText(QString(contacts[keys[idx]]));
+        string prevKey = (!r[0].empty) ? r[0][$ - 1] : keys[$ - 1];
+        nameLine.setText(QString(prevKey));
+        addressText.setText(contacts[prevKey]);
     }
 
+    //! [findContact() declaration]
+    //! [findContact() function]
     @QSlot final void findContact()
     {
+        import qt.widgets.dialog : QDialog;
+        import qt.widgets.messagebox : QMessageBox;
+
         dialog.show();
 
-        if (dialog.exec() == 1)
+        if (dialog.exec() == QDialog.DialogCode.Accepted)
         {
             auto contactName = dialog.getFindText();
+            string contactNameStr = contactName.toUtf8().toConstCharArray().idup;
 
-            if (qsToStr(contactName) in contacts)
+            if (contactNameStr in contacts)
             {
                 nameLine.setText(contactName);
-                addressText.setText(QString(contacts[qsToStr(contactName)]));
+                addressText.setText(contacts[contactNameStr]);
             }
             else
             {
@@ -286,10 +323,14 @@ class AddressBook : QWidget
 
         updateInterface(Mode.NavigationMode);
     }
+    //! [findContact() function]
+    //! [findContact() declaration]
+
+private:
 
     void updateInterface(Mode mode)
     {
-        import qt.core.namespace;
+        import qt.core.namespace : FocusReason;
 
         currentMode = mode;
 
@@ -313,7 +354,7 @@ class AddressBook : QWidget
             break;
 
         case Mode.NavigationMode:
-            if (contacts.length == 0)
+            if (contacts.length == 0) // TODO: QMap.isEmpty()
             {
                 nameLine.clear();
                 addressText.clear();
@@ -326,7 +367,6 @@ class AddressBook : QWidget
             auto number = contacts.length;
             editButton.setEnabled(number >= 1);
             removeButton.setEnabled(number >= 1);
-            findButton.setEnabled(number > 2);
             nextButton.setEnabled(number > 1);
             previousButton.setEnabled(number > 1);
 
@@ -339,15 +379,12 @@ class AddressBook : QWidget
         }
     }
 
-    static string qsToStr(QString qs)
-    {
-        return qs.toUtf8().toConstCharArray().idup;
-    }
-
     QPushButton addButton;
     QPushButton editButton;
     QPushButton removeButton;
+    //! [findButton declaration]
     QPushButton findButton;
+    //! [findButton declaration]
     QPushButton submitButton;
     QPushButton cancelButton;
     QPushButton nextButton;
@@ -355,8 +392,10 @@ class AddressBook : QWidget
     QLineEdit nameLine;
     QTextEdit addressText;
 
-    string[string] contacts;
+    QString[string] contacts; // TODO: QMap!(QString, QString) contacts;
+    //! [FindDialog declaration]
     FindDialog dialog;
+    //! [FindDialog declaration]
     QString oldName;
     QString oldAddress;
     Mode currentMode;
