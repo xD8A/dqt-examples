@@ -1,17 +1,11 @@
 module notepad;
 
 import qt.config;
+import qt.core.string : QString;
 import qt.helpers;
-import qt.core.string;
-import qt.gui.font;
-import qt.widgets.mainwindow;
-import qt.widgets.textedit;
-import qt.widgets.widget;
-import qt.widgets.ui;
-import qt.widgets.action;
-import qt.widgets.filedialog;
-import qt.widgets.messagebox;
-import qt.widgets.fontdialog;
+import qt.widgets.mainwindow : QMainWindow;
+import qt.widgets.ui : UIStruct;
+import qt.widgets.widget : QWidget;
 
 class Notepad : QMainWindow
 {
@@ -20,8 +14,7 @@ class Notepad : QMainWindow
 public:
     this(QWidget parent = null)
     {
-        import core.stdcpp.new_;
-        import qt.widgets.application;
+        import core.stdcpp.new_ : cpp_new;
 
         super(parent);
 
@@ -37,7 +30,13 @@ public:
 
         connect(ui.textEdit.signal!"copyAvailable", ui.actionCopy.slot!"setEnabled");
 
+        /+
+        TODO:
+        * QTextEdit.copy()
+
         connect(ui.actionCopy.signal!"triggered", ui.textEdit.slot!"copy");
+        +/
+        connect(ui.actionCopy.signal!"triggered", this.slot!"copyText");
         connect(ui.actionCut.signal!"triggered", ui.textEdit.slot!"cut");
         connect(ui.actionPaste.signal!"triggered", ui.textEdit.slot!"paste");
 
@@ -54,7 +53,6 @@ public:
 
         connect(ui.actionAbout.signal!"triggered", this.slot!"about");
 
-        ui.actionPrint.setEnabled(false);
         ui.actionCopy.setEnabled(false);
         ui.actionCut.setEnabled(false);
         ui.actionUndo.setEnabled(false);
@@ -63,28 +61,32 @@ public:
 
     ~this()
     {
-        import core.stdcpp.new_;
+        import core.stdcpp.new_ : cpp_delete;
+
         cpp_delete(ui);
     }
 
 private:
-    @QSlot final void newDocument()
+    @QSlot void newDocument()
     {
         currentFile = QString();
-        ui.textEdit.setText(QString());
+        ui.textEdit.setText(QString.create());
     }
 
-    @QSlot final void open()
+    @QSlot void open()
     {
-        import core.stdcpp.new_;
-        import qt.core.file;
+        import core.stdcpp.new_ : cpp_delete, cpp_new;
+        import qt.core.file : QFile;
+        import qt.widgets.filedialog : QFileDialog;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto fileName = QFileDialog.getOpenFileName(this, tr("Open File"));
         if (fileName.isEmpty())
             return;
 
         auto file = cpp_new!QFile(fileName);
-        scope(exit) cpp_delete(file);
+        scope (exit)
+            cpp_delete(file);
 
         if (!file.open(QFile.OpenMode(QFile.OpenModeFlag.ReadOnly | QFile.OpenModeFlag.Text)))
         {
@@ -99,7 +101,7 @@ private:
         file.close();
     }
 
-    @QSlot final void save()
+    @QSlot void save()
     {
         if (currentFile.isEmpty())
         {
@@ -107,11 +109,13 @@ private:
             return;
         }
 
-        import core.stdcpp.new_;
-        import qt.core.file;
+        import core.stdcpp.new_ : cpp_delete, cpp_new;
+        import qt.core.file : QFile;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto file = cpp_new!QFile(currentFile);
-        scope(exit) cpp_delete(file);
+        scope (exit)
+            cpp_delete(file);
 
         if (!file.open(QFile.OpenMode(QFile.OpenModeFlag.WriteOnly | QFile.OpenModeFlag.Text)))
         {
@@ -125,17 +129,20 @@ private:
         file.close();
     }
 
-    @QSlot final void saveAs()
+    @QSlot void saveAs()
     {
-        import core.stdcpp.new_;
-        import qt.core.file;
+        import core.stdcpp.new_ : cpp_delete, cpp_new;
+        import qt.core.file : QFile;
+        import qt.widgets.filedialog : QFileDialog;
+        import qt.widgets.messagebox : QMessageBox;
 
         auto fileName = QFileDialog.getSaveFileName(this, tr("Save As"));
         if (fileName.isEmpty())
             return;
 
         auto file = cpp_new!QFile(fileName);
-        scope(exit) cpp_delete(file);
+        scope (exit)
+            cpp_delete(file);
 
         if (!file.open(QFile.OpenMode(QFile.OpenModeFlag.WriteOnly | QFile.OpenModeFlag.Text)))
         {
@@ -150,41 +157,76 @@ private:
         file.close();
     }
 
-    @QSlot final void print()
+    @QSlot void print()
     {
-        // TODO: implement using QPdfWriter or QPrinter when available
+        /+
+        TODO:
+        * PrintSupport
+
+        import core.stdcpp.new_ : cpp_delete, cpp_new;
+        import qt.printsupport.printdialog : QPrintDialog;
+        import qt.printsupport.printer : QPrinter;
+        import qt.widgets.dialog : QDialog;
+
+        auto printer = cpp_new!QPrinter;
+        scope (exit)
+            cpp_delete(printer);
+
+        auto dialog = cpp_new!QPrintDialog(printer, this);
+        scope (exit)
+            cpp_delete(dialog);
+
+        if (dialog.exec() == QDialog.DialogCode.Accepted)
+            ui.textEdit.print(printer);
+        +/
     }
 
-    @QSlot final void selectFont()
+    @QSlot void selectFont()
     {
+        import qt.widgets.fontdialog : QFontDialog;
+
         bool ok = false;
         auto font = QFontDialog.getFont(&ok, this);
         if (ok)
             ui.textEdit.setFont(font);
     }
 
-    @QSlot final void setFontBold(bool bold)
+    @QSlot void setFontBold(bool bold)
     {
+        import qt.gui.font : QFont;
+
         if (bold)
             ui.textEdit.setFontWeight(QFont.Weight.Bold);
         else
             ui.textEdit.setFontWeight(QFont.Weight.Normal);
     }
 
-    @QSlot final void setFontItalic(bool italic)
+    @QSlot void setFontItalic(bool italic)
     {
         ui.textEdit.setFontItalic(italic);
     }
 
-    @QSlot final void setFontUnderline(bool underline)
+    @QSlot void setFontUnderline(bool underline)
     {
         ui.textEdit.setFontUnderline(underline);
     }
 
-    @QSlot final void about()
+    @QSlot void copyText()
     {
+        import qt.gui.clipboard : QClipboard;
+        import qt.widgets.application : QApplication;
+
+        auto clipboard = QApplication.clipboard();
+        clipboard.setText(ui.textEdit.textCursor().selectedText());
+    }
+
+    @QSlot void about()
+    {
+        import qt.widgets.messagebox : QMessageBox;
+
         QMessageBox.about(this, tr("About Notepad"),
-            tr("The <b>Notepad</b> example demonstrates how to code a basic text editor using QtWidgets"));
+            tr(
+                "The <b>Notepad</b> example demonstrates how to code a basic text editor using QtWidgets"));
     }
 
     UIStruct!"notepad.ui"* ui;

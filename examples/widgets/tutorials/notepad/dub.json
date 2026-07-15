@@ -4,9 +4,7 @@
     "authors": ["dqt-examples"],
     "preBuildCommands": ["rcc -binary notepad.qrc -o notepad.rcc"],
     "dependencies": {
-        "dqt": {
-            "path": "../../../../libs/dqt"
-        }
+        "dqt:widgets": "*"
     },
     "sourcePaths": ["."],
     "importPaths": ["."],
