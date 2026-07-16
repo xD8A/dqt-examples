@@ -8,6 +8,15 @@ RUN apt-get update && apt-get install -y \
     wget \
     curl \
     cmake \
+    git \
+    ninja-build \
+    gperf \
+    pkg-config \
+    bison \
+    flex \
+    python3 \
+    python3-pip \
+    python3-html5lib \
     nodejs \
     npm \
     libgl1-mesa-dev \
@@ -42,20 +51,52 @@ RUN apt-get update && apt-get install -y \
     libinput-dev \
     libxshmfence-dev \
     libxxf86vm-dev \
+    libharfbuzz-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libssl-dev \
+    libnss3-dev \
+    libglib2.0-dev \
+    libdrm-dev \
+    libxkbfile-dev \
+    libpulse-dev \
+    libdbus-1-dev \
+    libevent-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    liblcms2-dev \
+    libminizip-dev \
+    libre2-dev \
+    libpci-dev \
+    libwebp-dev \
+    libopus-dev \
+    libvpx-dev \
+    libsnappy-dev \
+    libxcomposite-dev \
+    libxcursor-dev \
+    libxrandr-dev \
+    libxi-dev \
+    libxtst-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Download the Qt 6.4.2 source tarball
+# Extract Qt 6.4.2 source archives from host directory
 WORKDIR /opt
-RUN wget https://download.qt.io/archive/qt/6.4/6.4.2/single/qt-everywhere-src-6.4.2.tar.xz \
-    && tar -xvf qt-everywhere-src-6.4.2.tar.xz \
-    && rm qt-everywhere-src-6.4.2.tar.xz
+RUN --mount=type=bind,source=downloads,target=/opt/downloads,ro,Z \
+    tar -xvf /opt/downloads/qt-everywhere-src-6.4.2.tar.xz \
+    && tar -xvf /opt/downloads/qtwebengine-everywhere-src-6.4.2.tar.xz \
+    && mv qtwebengine-everywhere-src-6.4.2 qt-everywhere-src-6.4.2/qtwebengine
 
-# Configure, build and install Qt 6.4.2 with XCB support (skip examples and tests to speed up)
-RUN cd qt-everywhere-src-6.4.2 \
-    && ./configure -prefix /opt/qt-6.4.2 -release -nomake examples -nomake tests -xcb \
-    && make -j$(nproc) \
-    && make install \
-    && cd .. && rm -rf qt-everywhere-src-6.4.2
+# Build and install Qt 6.4.2 with XCB, Pdf, and WebEngine
+WORKDIR /opt/qt-everywhere-src-6.4.2
+RUN ./configure -prefix /opt/qt-6.4.2 -release -nomake examples -nomake tests \
+        -xcb \
+        -skip qtdoc \
+    && cmake --build . --parallel \
+    && cmake --install . \
+    && cd .. && rm -rf /opt/qt-everywhere-src-6.4.2
+
+WORKDIR /opt
 
 # Make Qt shared libraries and pkg-config files discoverable
 ENV LD_LIBRARY_PATH=/opt/qt-6.4.2/lib:$LD_LIBRARY_PATH
