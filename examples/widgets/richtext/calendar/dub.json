@@ -1,0 +1,13 @@
+{
+    "name": "calendar",
+    "description": "Calendar example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "stringImportPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}
