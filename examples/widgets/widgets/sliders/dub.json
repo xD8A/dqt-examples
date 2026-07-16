@@ -1,0 +1,13 @@
+{
+    "name": "sliders",
+    "description": "Sliders example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:gui": "*",
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}

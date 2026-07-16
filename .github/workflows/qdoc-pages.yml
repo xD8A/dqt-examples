@@ -1,0 +1,74 @@
+name: QDoc Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.5.*
+          host: linux
+          target: desktop
+          modules: qttools
+          cache: true
+
+      - name: Create qdocconf
+        run: |
+          cat > dqt-examples.qdocconf << 'QDOCEOF'
+project = dqt-examples
+description = DQt examples
+version = 1.0
+
+headerdirs += .
+sourcedirs += .
+
+sourcedirs += ./examples/widgets/doc/src
+
+exampledirs += ./examples/widgets
+
+imagedirs += ./examples/widgets/doc/images
+
+outputformats = HTML
+
+outputdir = ./html
+
+sources.fileextensions = ".qdoc"
+
+examples.fileextensions = "*.d *.cpp *.h"
+QDOCEOF
+
+      - name: Run QDoc
+        run: qdoc dqt-examples.qdocconf
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-22.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,14 @@
+{
+    "name": "tooltips",
+    "description": "Tooltips Example (DQt port)",
+    "authors": ["dqt-examples"],
+    "preBuildCommands": ["rcc -binary tooltips.qrc -o tooltips.rcc"],
+    "dependencies": {
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "stringImportPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}

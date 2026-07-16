@@ -1,0 +1,17 @@
+{
+    "name": "windowcontainer",
+    "description": "Window Container example (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "rasterwindow": {
+            "path": "../../opengl/openglwindow",
+            "dependencyConfig": "library"
+        },
+        "dqt:widgets": "*",
+        "dqt:opengl": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}

@@ -1,0 +1,16 @@
+{
+    "name": "validators",
+    "description": "Validators Example (DQt port)",
+    "authors": ["dqt-examples"],
+    "preBuildCommands": ["rcc -binary validators.qrc -o validators.rcc"],
+    "dependencies": {
+        "dqt": {
+            "path": "../../../../libs/dqt"
+        }
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "stringImportPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}
