@@ -1,0 +1,12 @@
+{
+    "name": "addressbook_part7",
+    "description": "Address Book Tutorial - Part 7 (DQt port)",
+    "authors": ["dqt-examples"],
+    "dependencies": {
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}
