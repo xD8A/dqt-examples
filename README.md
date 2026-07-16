@@ -19,8 +19,15 @@ This repository includes a [Dev Container](https://code.visualstudio.com/docs/de
 
 ### Quick start
 
-1. Open the repository in VS Code.
-2. When prompted, click **Reopen in Container**. Alternatively, run the **Dev Containers: Reopen in Container** command from the command palette (`Ctrl+Shift+P`).
+1. Download the Qt 6.4.2 source archives into `.devcontainer/downloads/`:
+   ```bash
+   mkdir -p .devcontainer/downloads
+   wget -P .devcontainer/downloads \
+       https://download.qt.io/archive/qt/6.4/6.4.2/single/qt-everywhere-src-6.4.2.tar.xz \
+       https://download.qt.io/archive/qt/6.4/6.4.2/submodules/qtwebengine-everywhere-src-6.4.2.tar.xz
+   ```
+2. Open the repository in VS Code.
+3. When prompted, click **Reopen in Container**. Alternatively, run the **Dev Containers: Reopen in Container** command from the command palette (`Ctrl+Shift+P`).
 
 > **Note:** the initial build compiles Qt 6.4.2 from source and may take 30–60 minutes depending on your machine.
 

@@ -20,3 +20,12 @@ bin/
 
 # Compiled Qt resource files (generated from .qrc by rcc)
 *.rcc
+*.qm
+
+*.cpp
+*.h
+*.pro
+*.pri
+CMakeLists.txt
+*.cmake
+*.log

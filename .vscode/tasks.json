@@ -2,11 +2,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "dub build analogclock",
+            "label": "dub build validators",
             "type": "shell",
             "command": "dub build --compiler=ldc2",
             "options": {
-                "cwd": "${workspaceFolder}/examples/gui/analogclock"
+                "cwd": "${workspaceFolder}/examples/widgets/widgets/validators"
             },
             "group": "build",
             "problemMatcher": []

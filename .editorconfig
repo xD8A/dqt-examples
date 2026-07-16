@@ -1,0 +1,3 @@
+[*.d]
+dfmt_brace_style = allman
+dfmt_keep_comments = true

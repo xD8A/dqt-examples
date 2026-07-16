@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug analogclock",
+            "name": "Debug validators",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/examples/gui/analogclock/bin/analogclock",
+            "program": "${workspaceFolder}/examples/widgets/widgets/validators/bin/validators",
             "args": [],
-            "cwd": "${workspaceFolder}/examples/gui/analogclock",
-            "preLaunchTask": "dub build analogclock"
+            "cwd": "${workspaceFolder}/examples/widgets/widgets/validators",
+            "preLaunchTask": "dub build validators"
         }
     ]
 }
