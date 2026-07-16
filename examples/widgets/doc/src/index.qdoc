@@ -6,13 +6,19 @@
     examples ported from the official Qt documentation and rewritten in D
     using DQt bindings.
 
-    \section1 Tutorials
+    \section1 Widgets
+
+    \section2 Tutorials
 
     \list
       \li \l{Address Book Tutorial}
     \endlist
 
-    \section1 Widgets
+    \section2 Widgets
+
+    \list
+      \li \l{Calculator Example}
+    \endlist
 
     \section2 Rich Text
 
