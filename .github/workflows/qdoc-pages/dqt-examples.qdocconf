@@ -1,0 +1,33 @@
+project = dqt-examples
+description = DQt examples
+version = 1.0
+
+headerdirs += ../../..
+sourcedirs += ../../..
+
+sourcedirs += ../../../examples/widgets/doc/src
+
+exampledirs += ../../../examples/widgets
+
+imagedirs += ../../../examples/widgets/doc/images
+
+outputformats = HTML
+
+outputdir = ../../../html
+
+HTML.stylesheets = style/style.css
+
+HTML.headerstyles = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style/style.css\" />\n" \
+                    "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css\">\n"
+
+HTML.footer = "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js\"></script>\n" \
+              "<script>\n" \
+              "document.addEventListener('DOMContentLoaded', () => {\n" \
+              "  hljs.configure({ cssSelector: 'pre.d' });\n" \
+              "  hljs.highlightAll();\n" \
+              "});\n" \
+              "</script>\n"
+
+sources.fileextensions = ".qdoc"
+
+examples.fileextensions = "*.d *.cpp *.h"

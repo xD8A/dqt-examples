@@ -1,0 +1,16 @@
+/*!
+    \page index.html
+    \title DQt Examples
+
+    DQt is a set of D bindings for the Qt Toolkit. This project contains
+    examples ported from the official Qt documentation and rewritten in D
+    using DQt bindings.
+
+    \section1 Widgets
+
+    \section2 Rich Text
+
+    \list
+      \li \l{Calendar Example}
+    \endlist
+*/

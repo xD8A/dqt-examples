@@ -1,0 +1,54 @@
+name: QDoc Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.5.3
+          host: linux
+          target: desktop
+          cache: true
+
+      - name: Install qdoc (qttools)
+        run: sudo apt-get install -y qt6-tools-dev-tools
+
+      - name: Run QDoc
+        run: qdoc .github/workflows/qdoc-pages/dqt-examples.qdocconf
+
+      - name: Fix language class in code blocks
+        run: sed -i 's|<pre class="cpp"|<pre class="d"|g' html/*.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-22.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
