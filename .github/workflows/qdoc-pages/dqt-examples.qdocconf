@@ -22,7 +22,7 @@ outputdir = ../../../html
 HTML.stylesheets = style/style.css
 
 HTML.headerstyles = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style/style.css\" />\n" \
-                    "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css\">\n"
+                    "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark-dimmed.min.css\">\n"
 
 HTML.footer = "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js\"></script>\n" \
               "<script>\n" \
