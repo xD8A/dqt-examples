@@ -5,11 +5,15 @@ version = 1.0
 headerdirs += ../../..
 sourcedirs += ../../..
 
+sourcedirs += ../../../examples/doc/src
 sourcedirs += ../../../examples/widgets/doc/src
+sourcedirs += ../../../examples/gui/doc/src
 
 exampledirs += ../../../examples/widgets
+exampledirs += ../../../examples/gui
 
 imagedirs += ../../../examples/widgets/doc/images
+imagedirs += ../../../examples/gui/doc/images
 
 outputformats = HTML
 
