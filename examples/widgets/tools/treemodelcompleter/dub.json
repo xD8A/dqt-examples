@@ -1,0 +1,14 @@
+{
+	"name": "treemodelcompleter",
+    "description": "Tree Model Completer Example (DQt port)",
+    "authors": ["dqt-examples"],
+    "preBuildCommands": ["rcc -binary treemodelcompleter.qrc -o treemodelcompleter.rcc"],
+    "dependencies": {
+        "dqt:widgets": "*"
+    },
+    "sourcePaths": ["."],
+    "importPaths": ["."],
+    "stringImportPaths": ["."],
+    "targetType": "executable",
+    "targetPath": "bin"
+}
