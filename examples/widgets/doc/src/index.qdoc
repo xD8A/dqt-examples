@@ -1,5 +1,5 @@
 /*!
-    \page index
+    \page index.html
     \title DQt Examples
 
     DQt is a set of D bindings for the Qt Toolkit. This project contains
@@ -33,6 +33,12 @@
 
     \list
       \li \l{Calendar Example}
+    \endlist
+
+    \section2 Painting
+
+    \list
+      \li \l{Transformations Example}
     \endlist
 
     \section1 GUI
