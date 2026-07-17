@@ -1,14 +1,14 @@
 module main;
 
+import core.runtime : Runtime;
+import core.stdcpp.new_ : cpp_delete, cpp_new;
+import qt.widgets.application : QApplication;
+
 import addressbook : AddressBook;
 
 //! [main function]
 int main()
 {
-    import core.runtime : Runtime;
-    import core.stdcpp.new_ : cpp_new, cpp_delete;
-    import qt.widgets.application : QApplication;
-
     scope app = new QApplication(Runtime.cArgs.argc, Runtime.cArgs.argv);
 
     auto addressBook = cpp_new!AddressBook();

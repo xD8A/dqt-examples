@@ -32,11 +32,17 @@
     text can also be adjusted.
 
     \snippet richtext/calendar/mainwindow.d h_0
+    \dots
     \snippet richtext/calendar/mainwindow.d h_1
+    \dots
     \snippet richtext/calendar/mainwindow.d h_2
+    \dots
     \snippet richtext/calendar/mainwindow.d h_3
+    \dots
     \snippet richtext/calendar/mainwindow.d h_4
+    \dots
     \snippet richtext/calendar/mainwindow.d h_5
+    \dots
     \snippet richtext/calendar/mainwindow.d h_6
 
     The private \c insertCalendar() function performs most of the work, relying on

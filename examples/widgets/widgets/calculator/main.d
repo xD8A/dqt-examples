@@ -1,13 +1,13 @@
 module main;
 
-import calculator;
+import core.runtime : Runtime;
+import core.stdcpp.new_ : cpp_delete, cpp_new;
+import qt.widgets.application : QApplication;
+
+import calculator : Calculator;
 
 int main()
 {
-    import core.runtime;
-    import core.stdcpp.new_;
-    import qt.widgets.application;
-
     scope app = new QApplication(Runtime.cArgs.argc, Runtime.cArgs.argv);
 
     auto calc = cpp_new!Calculator();
